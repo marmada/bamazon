@@ -1,0 +1,30 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "npm packets and dependencies for app",
+  "main": "bamazonCustomer.js",
+  "dependencies": {
+    "inquirer": "^5.2.0",
+    "mysql": "^2.15.0",
+    "request": "^2.85.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "q"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marmada/bamazon.git"
+  },
+  "keywords": [
+    "node",
+    "mysql",
+    "requirer"
+  ],
+  "author": "marmada",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/marmada/bamazon/issues"
+  },
+  "homepage": "https://github.com/marmada/bamazon#readme"
+}
