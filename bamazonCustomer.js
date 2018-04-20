@@ -10,7 +10,7 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: 4390,
+  password: "4390",
   database: "bamazon"
 });
 
@@ -27,28 +27,33 @@ connection.connect(function(err) {
     inquirer
       .prompt({
         
-          type: "list",
+          type: "rawlist",
           message: "Enter Login Info or Create new user, press 1, 2 or 3",
-          choices: ["1) Login" , "2) New User", "3) Exit"],
+          choices: [ "Login" , "New User", "Exit"],
           name: "amazonAccess"
         }
 
-      .then(function(res) {
+      ).then(function(res) {
         // based on their answer, either call the bid or the post functions
-        if (err) throw err;
+      
+        //if (err){ throw err}
+        console.log(res);
+        return;
 
         var choice = res.amazonAccess;
 
         switch (choice) {
 
-          case 1: login();
+          case "login": login();
           break;
+          return;
 
-          case 2: Console.log("create user function working");
+          case "New User": Console.log("create user function working");
           //createUser();
           break;
+          return;
 
-          case 3:
+          case "Exit":
           return "Good bye! Thank you for visiting Bamazon";
           break;
 
@@ -56,7 +61,7 @@ connection.connect(function(err) {
           console.log ("Invalid Choice, going back to the main menu");
           start();
           }
-      })); 
+      }); 
 }
 
 function login(){
@@ -76,7 +81,7 @@ function login(){
   }])
 
 .then(function(res) {
-  // based on their answer, either call the bid or the post functions
+
   if (err) throw err;
 
   var user = res.username;
@@ -85,11 +90,11 @@ function login(){
   var query = "SELECT user, passw, user_type FROM user WHERE ?";
   connection.query(query, { user: user }, function(err, res) {
     if (err) throw err;
-    if (psw== res.passw && user_type=="USER" ){
+    if (psw== res.passw && res.user_type=="USER" ){
       console.log("this is working");
      // showStore();
     }
-    if(pws== res.passw && user_type=="MGR"){
+    if(pws== res.passw && res.user_type=="MGR"){
       console.log("mgr menu working")
       //showMgtMenu();
     }
