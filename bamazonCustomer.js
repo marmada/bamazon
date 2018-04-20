@@ -30,7 +30,7 @@ connection.connect(function(err) {
           type: "rawlist",
           message: "Enter Login Info or Create new user, press 1, 2 or 3",
           choices: [ "Login" , "New User", "Exit"],
-          name: "amazonAccess"
+          name: "bamazonAccess"
         }
 
       ).then(function(res) {
@@ -38,22 +38,24 @@ connection.connect(function(err) {
       
         //if (err){ throw err}
         console.log(res);
-        return;
+  
 
-        var choice = res.amazonAccess;
+        var choice = res.bamazonAccess;
 
         switch (choice) {
 
-          case "login": login();
+          case 'Login': 
+          login();
           break;
-          return;
+         
 
-          case "New User": Console.log("create user function working");
+          case 'New User': 
+          console.log("create user function working");
           //createUser();
           break;
           return;
 
-          case "Exit":
+          case 'Exit':
           return "Good bye! Thank you for visiting Bamazon";
           break;
 
@@ -69,12 +71,12 @@ function login(){
   inquirer
   .prompt([{
         
-  name: username,
-  type: "text",
-  message: "Please enter your username"
+  type: "input",
+  name: "username",
+  message: "Please enter your username/email"
   },
   {
-    name: password,
+    name: "password",
     type: "password",
     message: "Please enter your password"
    
@@ -82,15 +84,16 @@ function login(){
 
 .then(function(res) {
 
-  if (err) throw err;
+  console.log(res);
+  return;
 
-  var user = res.username;
+ var user = res.username;
   var psw =res.password;
 
   var query = "SELECT user, passw, user_type FROM user WHERE ?";
-  connection.query(query, { user: user }, function(err, res) {
+  connection.query(query, { user: user }, function(err, response) {
     if (err) throw err;
-    if (psw== res.passw && res.user_type=="USER" ){
+    if (psw== response.passw && response.user_type=="USER" ){
       console.log("this is working");
      // showStore();
     }
