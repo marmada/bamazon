@@ -1,6 +1,5 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-
 var MYSQLPS = require ('./dbPassword.js');
 var request = require ('request');
 
@@ -9,11 +8,18 @@ var request = require ('request');
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
-
-  // Your username
   user: "root",
-
-  // Your password
-  password: MYSQLPS,
-  database: "products"
+  password: dbPassword.MYSQLPW,
+  database: "bamazon"
 });
+
+connection.connect(function(err) {
+  if (err) throw err;
+  console.log("connected as id " + connection.threadId + "\n");
+  // START FUNCTION
+});
+
+function storeCatalog (){
+
+  
+}

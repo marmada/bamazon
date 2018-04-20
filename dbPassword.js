@@ -1,2 +1,2 @@
 
-  exports.MYSQLPW = 4390
+  exports.MYSQLPW = process.env.MYSQLPW;
