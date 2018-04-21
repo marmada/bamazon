@@ -65,22 +65,23 @@ function login () {
       {
         type: 'input',
         name: 'username',
-        message: 'Please enter your username/email',
+        message: 'Please enter your username/email:',
       },
       {
         name: 'password',
         type: 'input',
-        message: 'Please enter your password',
+        message: 'Please enter your password:',
       },
     ])
     .then (function (res) {
+
       //console.log (res);
 
       var id = res.username;
       var psw = res.password;
       var query = 'SELECT * FROM user WHERE ?';
 
-      connection.query (query, {username: id}, function (
+      connection.query (query, {username: res.username}, function (
         err,
         response
       ) {
@@ -89,7 +90,8 @@ function login () {
         if (err) throw err;
 
         if (psw == response[0].passw) {
-          //console.log ('authentification is working');
+        console.log ('WELCOME TO BAMAZON, you are login as:' + response[0].username);
+
           switch (response[0].user_type) {
             case 'USER':
               showStore ();
@@ -108,34 +110,96 @@ function login () {
     });
 }
 
-function showStore(){
-
-  Console.log("============================================================\n" +
-  "=====================WELCOME==TO=BAMAZON======================\n" + 
-  "============================================================\n");
+function showStore () {
+  console.log (
+    '============================================================\n' +
+      '====================WELCOME==TO=BAMAZON=====================\n' +
+      '============================================================\n'
+  );
 
   var query = 'SELECT * FROM products';
 
-  connection.query (query, function (
-    err,
-    store
-  ) {
+  connection.query (query, function (err, store) {
     if (err) throw err;
-    console.log ("ID | PRODUCT NAME | PRICE");
+    console.log ('ID | PRODUCT NAME | PRICE');
     for (var i = 0; i < store.length; i++) {
-        console.log(store[i].item_id + " | " + store[i].product_name + " | " + store[i].product_name + "\n");
-    } 
-  
-});}
+      console.log (
+        store[i].item_id +
+          ' | ' +
+          store[i].product_name +
+          ' | ' +
+          store[i].price
+      );
+    shopNow();
+    }});}
 
-function mgrMenu(){
+    function shopNow(){
+      inquirer
+    .prompt ([
+      {
+        type: 'input',
+        name: 'id',
+        message: 'Please enter the product ID for the item you want to purchase:',
+      },
+      {
+        name: 'quantity',
+        type: 'input',
+        message: 'Please Enter the Quantity',
+      },
+      { name: 'moreItems',
+        type: 'confirm',
+        message: "Would you like to buy and additional Item?"}
+    ])
+    .then (function (res) {
+      var item = res.id;
+      var qty = parseINT(res.quantity);
+      var option = res.moreItems;
+      var query = 'SELECT * FROM products WHERE ?';
 
+      connection.query (query, {item_id : item}, function (err, order) {
+      if (err) throw err;
+
+      if( qty > order[0].stock_quantity){
+        
+        console.log("We are sorry, the quantity you have ordered for" + order[0].product_name + "is not available, you will be return to the store Menu");
+        showStore();
+      }
+      else{
+
+        var orderTotal = order[0].price * qty;
+        var newInv = order[0].stock_quantity - qty;
+        console.log("You have place and order for:" + qty + " " + order[0].product_name);
+        console.log("Your order total is: $"+ orderTotal);
+      }
+      
+      switch (option){
+      
+        case true :
+        showStore();
+        updateInv(item, newInv);
+        break;
+
+        case false :
+        console.log("Thank you for purchasing with Bamazon, application will close now");
+        return
+    }
+
+    });});}
+
+
+function mgrMenu () {
   var query = 'SELECT * FROM products';
 
-  connection.query (query, function (
-    err,
-    store
-  ) {
-    console.log ("mgrfunction works");
+  connection.query (query, function (err, store) {
+    console.log ('mgrfunction works');
+  });
+}
+
+function updateInv (item, newInv){
+
+  var item = item;
+  var inv = newInv;
   
-});}
+
+
+}
