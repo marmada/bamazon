@@ -74,7 +74,6 @@ function login () {
       },
     ])
     .then (function (res) {
-
       //console.log (res);
 
       var id = res.username;
@@ -90,7 +89,9 @@ function login () {
         if (err) throw err;
 
         if (psw == response[0].passw) {
-        console.log ('WELCOME TO BAMAZON, you are login as:' + response[0].username);
+          console.log (
+            'WELCOME TO BAMAZON, you are login as:' + response[0].username
+          );
 
           switch (response[0].user_type) {
             case 'USER':
@@ -130,11 +131,13 @@ function showStore () {
           ' | ' +
           store[i].price
       );
-    shopNow();
-    }});}
+      shopNow ();
+    }
+  });
+}
 
-    function shopNow(){
-      inquirer
+function shopNow () {
+  inquirer
     .prompt ([
       {
         type: 'input',
@@ -146,46 +149,52 @@ function showStore () {
         type: 'input',
         message: 'Please Enter the Quantity',
       },
-      { name: 'moreItems',
+      {
+        name: 'moreItems',
         type: 'confirm',
-        message: "Would you like to buy and additional Item?"}
+        message: 'Would you like to buy and additional Item?',
+      },
     ])
     .then (function (res) {
       var item = res.id;
-      var qty = parseINT(res.quantity);
+      var qty = parseINT (res.quantity);
       var option = res.moreItems;
       var query = 'SELECT * FROM products WHERE ?';
 
-      connection.query (query, {item_id : item}, function (err, order) {
-      if (err) throw err;
+      connection.query (query, {item_id: item}, function (err, order) {
+        if (err) throw err;
 
-      if( qty > order[0].stock_quantity){
-        
-        console.log("We are sorry, the quantity you have ordered for" + order[0].product_name + "is not available, you will be return to the store Menu");
-        showStore();
-      }
-      else{
+        if (qty > order[0].stock_quantity) {
+          console.log (
+            'We are sorry, the quantity you have ordered for' +
+              order[0].product_name +
+              'is not available, , there is only ' + order[0].stock_quantity +' items available; you will be return to the store Menu'
+          );
+          showStore ();
+        } else {
+          var orderTotal = order[0].price * qty;
+          var newInv = order[0].stock_quantity - qty;
+          console.log (
+            'You have place and order for:' + qty + ' ' + order[0].product_name
+          );
+          console.log ('Your order total is: $' + orderTotal);
 
-        var orderTotal = order[0].price * qty;
-        var newInv = order[0].stock_quantity - qty;
-        console.log("You have place and order for:" + qty + " " + order[0].product_name);
-        console.log("Your order total is: $"+ orderTotal);
-      }
-      
-      switch (option){
-      
-        case true :
-        showStore();
-        updateInv(item, newInv);
-        break;
+          switch (option) {
+            case true:
+              showStore ();
+              updateInv (item, newInv);
+              break;
 
-        case false :
-        console.log("Thank you for purchasing with Bamazon, application will close now");
-        return
-    }
-
-    });});}
-
+            case false:
+              console.log (
+                'Thank you for purchasing with Bamazon, the application will close now'
+              );
+              return;
+          }
+        }
+      });
+    });
+}
 
 function mgrMenu () {
   var query = 'SELECT * FROM products';
@@ -195,11 +204,24 @@ function mgrMenu () {
   });
 }
 
-function updateInv (item, newInv){
-
+function updateInv (item, newInv) {
   var item = item;
   var inv = newInv;
-  
 
-
+  console.log("Inv function called");
+  var query = connection.query(
+    "UPDATE products SET ? WHERE ?",
+    [
+      {
+        stock_quantity : newInv
+      },
+      {
+        item_id: item
+      }
+    ],
+    function(err, res) {
+      console.log(res.affectedRows + " products updated!\n");
+   
+    }
+  );
 }
