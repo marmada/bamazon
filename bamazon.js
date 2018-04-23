@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
 });
 
 // start application
-connection.connect(function(err) {
+connection.connect(function (err) {
   if (err) throw err;
   console.log('connected as id ' + connection.threadId + '\n');
   start();
@@ -30,7 +30,7 @@ function start() {
       choices: ['Login', 'New User', 'Exit'],
       name: 'bamazonAccess',
     })
-    .then(function(res) {
+    .then(function (res) {
       // based on their answer, either call the bid or the post functions
 
       //if (err){ throw err}
@@ -62,8 +62,7 @@ function start() {
 
 function login() {
   inquirer
-    .prompt([
-      {
+    .prompt([{
         type: 'input',
         name: 'username',
         message: 'Please enter your username/email:',
@@ -74,12 +73,14 @@ function login() {
         message: 'Please enter your password:',
       },
     ])
-    .then(function(res) {
+    .then(function (res) {
       //console.log (res);
 
       var query = 'SELECT * FROM user WHERE ?';
 
-      connection.query(query, {username: res.username}, function(
+      connection.query(query, {
+        username: res.username
+      }, function (
         err,
         response
       ) {
@@ -90,8 +91,8 @@ function login() {
         if (res.password == response[0].passw) {
           console.log(
             '\n WELCOME TO BAMAZON, you are logged in as:' +
-              response[0].username +
-              '\n'
+            response[0].username +
+            '\n'
           );
 
           switch (response[0].user_type) {
@@ -115,22 +116,22 @@ function login() {
 function showStore() {
   console.log(
     '============================================================\n' +
-      '====================WELCOME==TO=BAMAZON=====================\n' +
-      '============================================================\n'
+    '====================WELCOME==TO=BAMAZON=====================\n' +
+    '============================================================\n'
   );
 
   var query = 'SELECT * FROM products';
 
-  connection.query(query, function(err, store) {
+  connection.query(query, function (err, store) {
     if (err) throw err;
     console.log('ID | PRODUCT NAME | PRICE');
     for (var i = 0; i < store.length; i++) {
       console.log(
         store[i].item_id +
-          ' | ' +
-          store[i].product_name +
-          ' | ' +
-          store[i].price
+        ' | ' +
+        store[i].product_name +
+        ' | ' +
+        store[i].price
       );
     }
     console.log('============================================================');
@@ -140,17 +141,15 @@ function showStore() {
 
 function shopNow() {
   inquirer
-    .prompt([
-      {
+    .prompt([{
         type: 'input',
         name: 'id',
-        message:
-          'Please enter the product ID for the item you want to purchase:',
+        message: 'Please enter the product ID for the item you want to purchase:',
       },
       {
         name: 'quantity',
         type: 'input',
-        message: 'Please Enter the Quantity',
+        message: 'Please Enter the Quantity:',
       },
       {
         name: 'moreItems',
@@ -158,22 +157,24 @@ function shopNow() {
         message: 'Would you like to buy and additional Item?',
       },
     ])
-    .then(function(res) {
+    .then(function (res) {
       var item = res.id;
       var qty = res.quantity;
       var option = res.moreItems;
       var query = 'SELECT * FROM products WHERE ?';
 
-      connection.query(query, {item_id: item}, function(err, order) {
+      connection.query(query, {
+        item_id: item
+      }, function (err, order) {
         if (err) throw err;
 
         if (qty > order[0].stock_quantity) {
           console.log(
-            'We are sorry, the quantity you have ordered for' +
-              order[0].product_name +
-              'is not available, , there is only ' +
-              order[0].stock_quantity +
-              ' items available; you will be return to the store Menu'
+            'We are sorry, the quantity you have ordered for ' +
+            order[0].product_name +
+            'is not available, there is only ' +
+            order[0].stock_quantity +
+            ' items available; you will be return to the store Menu'
           );
           console.log(
             '============================================================'
@@ -185,19 +186,19 @@ function shopNow() {
           orderGrandTotal = orderGrandTotal + orderTotal;
 
           console.log(
-            'You have place and order for:' +
-              qty +
-              ' ' +
-              order[0].product_name +
-              '\n'
+            'You have place and order for:\n' +
+            qty +
+            '    ' +
+            order[0].product_name +
+            '\n'
           );
           console.log(
-            'Your total for this purchase is' +
-              orderTotal +
-              '\n' +
-              'Your order grand total on this session is: $' +
-              orderGrandTotal +
-              '\n'
+            'Your total for this purchase is: $' +
+            orderTotal +
+            '\n' +
+            'Your order grand total on this session is: $' +
+            orderGrandTotal +
+            '\n'
           );
 
           switch (option) {
@@ -235,7 +236,7 @@ function mgrMenu() {
       ],
       name: 'bamazonMGR',
     })
-    .then(function(res) {
+    .then(function (res) {
       // based on their answer, either call the bid or the post functions
 
       //if (err){ throw err}
@@ -287,19 +288,17 @@ function updateInv(item, newInv) {
   var item = item;
   var inv = newInv;
 
-  console.log('Inv function called');
+  //console.log('Inv function called');
   var query = connection.query(
-    'UPDATE products SET ? WHERE ?',
-    [
-      {
+    'UPDATE products SET ? WHERE ?', [{
         stock_quantity: newInv,
       },
       {
         item_id: item,
       },
     ],
-    function(err, res) {
-      console.log(res.affectedRows + ' products updated!\n');
+    function (err, res) {
+      // console.log(res.affectedRows + ' products updated!\n');
     }
   );
 }
@@ -310,8 +309,7 @@ function newUser() {
   );
 
   inquirer
-    .prompt([
-      {
+    .prompt([{
         type: 'input',
         name: 'username',
         message: 'Please enter an email/username to create your account :',
@@ -322,23 +320,22 @@ function newUser() {
         message: 'Please create a password (alphanumeric)',
       },
     ])
-    .then(function(nUser) {
+    .then(function (nUser) {
       var query = 'INSERT INTO user SET ?';
 
       connection.query(
-        query,
-        {
+        query, {
           username: nUser.username,
           passw: nUser.password,
           user_type: 'USER',
         },
-        function(err, res) {
+        function (err, res) {
           console.log(
             res.affectedRows +
-              ' new user has been created \n' +
-              'You will be return to the main menu, then you can go ahead an login \n'
+            ' new user has been created \n' +
+            'You will be return to the main menu, then you can go ahead an login \n'
           );
-          login();
+          start();
         }
       );
     });
@@ -347,26 +344,26 @@ function newUser() {
 function productInv() {
   console.log(
     '============================================================\n' +
-      '====================WELCOME==TO=BAMAZON=====================\n' +
-      '============================================================\n'
+    '====================WELCOME==TO=BAMAZON=====================\n' +
+    '============================================================\n'
   );
 
   var query = 'SELECT * FROM products';
 
-  connection.query(query, function(err, store) {
+  connection.query(query, function (err, store) {
     if (err) throw err;
     console.log('ID | PRODUCT NAME | PRICE | COST | INVENTORY');
     for (var i = 0; i < store.length; i++) {
       console.log(
         store[i].item_id +
-          ' | ' +
-          store[i].product_name +
-          ' | ' +
-          store[i].price +
-          ' | ' +
-          store[i].cost +
-          ' | ' +
-          store[i].stock_quantity
+        ' | ' +
+        store[i].product_name +
+        ' | ' +
+        store[i].price +
+        ' | ' +
+        store[i].cost +
+        ' | ' +
+        store[i].stock_quantity
       );
     }
     console.log('============================================================');
@@ -378,26 +375,26 @@ function productInv() {
 function lowInv() {
   console.log(
     '============================================================\n' +
-      '====================WELCOME==TO=BAMAZON=====================\n' +
-      '=======================LOW INV LISTING======================\n'
+    '====================WELCOME==TO=BAMAZON=====================\n' +
+    '=======================LOW INV LISTING======================\n'
   );
 
   var query = 'SELECT * FROM products WHERE stock_quantity <= 10';
 
-  connection.query(query, function(err, store) {
+  connection.query(query, function (err, store) {
     if (err) throw err;
     console.log('ID | PRODUCT NAME | PRICE | COST | INVENTORY');
     for (var i = 0; i < store.length; i++) {
       console.log(
         store[i].item_id +
-          ' | ' +
-          store[i].product_name +
-          ' | ' +
-          store[i].price +
-          ' | ' +
-          store[i].cost +
-          ' | ' +
-          store[i].stock_quantity
+        ' | ' +
+        store[i].product_name +
+        ' | ' +
+        store[i].price +
+        ' | ' +
+        store[i].cost +
+        ' | ' +
+        store[i].stock_quantity
       );
     }
     console.log('============================================================');
@@ -408,8 +405,7 @@ function lowInv() {
 
 function addNewProduct() {
   inquirer
-    .prompt([
-      {
+    .prompt([{
         type: 'input',
         name: 'productname',
         message: 'Please enter new Product Name/Description:',
@@ -446,20 +442,19 @@ function addNewProduct() {
         ],
       },
     ])
-    .then(function(res) {
+    .then(function (res) {
       connection.query(
-        'INSERT INTO products SET ?',
-        {
+        'INSERT INTO products SET ?', {
           product_name: res.productname,
           department_name: res.category,
           stock_quantity: res.quantity,
           cost: res.cost,
           price: res.price,
         },
-        function(err, res) {
+        function (err, res) {
           if (err) throw err;
 
-          console.log(res.affectedRows + ' product inserted!\n');
+          //console.log(res.affectedRows + ' product inserted!\n');
         }
       );
 
@@ -468,11 +463,11 @@ function addNewProduct() {
 }
 
 function updateInventoryMGR() {
-  productInv();
 
+  console.log("\n\r ");
+  
   inquirer
-    .prompt([
-      {
+    .prompt([{
         type: 'input',
         name: 'id',
         message: 'Select Item Id to be updated: ',
@@ -482,55 +477,37 @@ function updateInventoryMGR() {
         name: 'newInv',
         message: 'Enter New Quantity Available: ',
       },
-      {
-        type: 'confirm',
-        name: 'otherItem',
-        message: 'Would you like to update Another Item? ',
-      },
+    
     ])
-    .then(function(res) {
-      console.log('Inv Update function called');
+    .then(function (res) {
+      //console.log('Inv Update function called');
 
-      var query = connection.query(
-        'UPDATE products SET ? WHERE ?',
-        [
-          {
+    connection.query(
+        'UPDATE products SET ? WHERE ?', [{
             stock_quantity: res.newInv,
           },
           {
-            item_id: id,
+            item_id: res.id,
           },
         ],
-        function(err, res) {
+        function (err, res) {
           console.log(res.affectedRows + ' products updated!\n');
         }
       );
-      var option = res.otherItem;
-
-      switch (option) {
-        case true:
-          updateInventoryMGR();
-          break;
-
-        case false:
-          console.log('Product Updated, Going back to Manager Menu');
-          mgrMenu();
-          break;
-
-        default:
-          start();
-      }
+      
     });
+
+    mgrMenu();
 }
+
 
 function newUserMGR() {
   console.log(
-    'Hellow, a menu will be prompt to create the new user account!\n'
+    'Hello, a menu will be prompt to create the new user account!\n'
   );
 
   inquirer
-    .prompt([
-      {
+    .prompt([{
         type: 'input',
         name: 'username',
         message: 'Please enter an email/username to create the account :',
@@ -547,21 +524,20 @@ function newUserMGR() {
         choices: ['USER', 'MGR'],
       },
     ])
-    .then(function(nUser) {
+    .then(function (nUser) {
       var query = 'INSERT INTO user SET ?';
 
       connection.query(
-        query,
-        {
+        query, {
           username: nUser.username,
           passw: nUser.password,
           user_type: nUser.type,
         },
-        function(err, res) {
+        function (err, res) {
           console.log(
             res.affectedRows +
-              ' new user has been created \n' +
-              'You will be returned to the Manager Manue.\n'
+            ' new user has been created \n' +
+            'You will be returned to the Manager Manue.\n'
           );
           mgrMenu();
         }
