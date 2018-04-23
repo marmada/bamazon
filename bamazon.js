@@ -224,11 +224,14 @@ function mgrMenu() {
       type: 'rawlist',
       message: 'Please select from the following options: ',
       choices: [
+        'Add Product',
         'Check Store Stock Status',
-        'Update Existing User to MGR',
         'Check Low Inventory',
-        'Check total SALES by Product',
         'Create New User',
+        'Update Existing User to MGR',
+        'Update Product Inventory',
+        'Shop',
+        'Go back to Main Menu'
       ],
       name: 'bamazonMGR',
     })
@@ -241,8 +244,12 @@ function mgrMenu() {
       var choice = res.bamazonMGR;
 
       switch (choice) {
+        case 'Add Product':
+          addNewProduct();
+          break;
+
         case 'Check Store Stock Status':
-          //productInv();
+          productInv();
           break;
 
         case 'Update Existing User to MGR':
@@ -250,20 +257,24 @@ function mgrMenu() {
           break;
 
         case 'Check Low Inventory':
-        //lowInv();
-        break;
+          lowInv();
+          break;
 
-        case 'Check total SALES by Product':
-        //totalSales();
-        break;
+        case 'Update Product Inventory':
+          updateInventoryMGR();
+          break;
 
         case 'Create New User':
-        //newUserMGR();
-        break;
-        
-        case 'Exit':
-          return 'Good bye! Thank you for visiting Bamazon';
+          //newUserMGR();
           break;
+
+        case 'Go back to Main Menu':
+         start();
+          break;
+
+          case 'Shop':
+          showStore();
+           break;
 
         default:
           console.log('Invalid Choice, going back to the main menu');
@@ -332,3 +343,153 @@ function newUser() {
       );
     });
 }
+
+function productInv() {
+  console.log(
+    '============================================================\n' +
+      '====================WELCOME==TO=BAMAZON=====================\n' +
+      '============================================================\n'
+  );
+
+  var query = 'SELECT * FROM products';
+
+  connection.query(query, function(err, store) {
+    if (err) throw err;
+    console.log('ID | PRODUCT NAME | PRICE | COST | INVENTORY');
+    for (var i = 0; i < store.length; i++) {
+      console.log(
+        store[i].item_id +
+          ' | ' +
+          store[i].product_name +
+          ' | ' +
+          store[i].price +
+          ' | ' +
+          store[i].cost +
+          ' | ' +
+          store[i].stock_quantity
+      );
+    }
+    console.log('============================================================');
+
+    mgrMenu();
+  });
+}
+
+function lowInv() {
+  console.log(
+    '============================================================\n' +
+      '====================WELCOME==TO=BAMAZON=====================\n' +
+      '=======================LOW INV LISTING======================\n'
+  );
+
+  var query = 'SELECT * FROM products WHERE stock_quantity <= 10';
+
+  connection.query(query, function(err, store) {
+    if (err) throw err;
+    console.log('ID | PRODUCT NAME | PRICE | COST | INVENTORY');
+    for (var i = 0; i < store.length; i++) {
+      console.log(
+        store[i].item_id +
+          ' | ' +
+          store[i].product_name +
+          ' | ' +
+          store[i].price +
+          ' | ' +
+          store[i].cost +
+          ' | ' +
+          store[i].stock_quantity
+      );
+    }
+    console.log('============================================================');
+
+    mgrMenu();
+  });
+}
+
+function addNewProduct(){
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'productname',
+        message:
+          'Please enter new Product Name/Description:',
+      },
+      {
+        name: 'quantity',
+        type: 'input',
+        message: 'Please Enter Initial Inventory Quantity',
+      },
+      {
+        name: 'cost',
+        type: 'input',
+        message: 'Please Enter the Cost per Item',
+      },
+      {
+        name: 'price',
+        type: 'input',
+        message: 'Please Enter the Price per Item',
+      },
+      {
+        name: 'category',
+        type: 'rawlist',
+        message: 'Please Select the Category',
+        choices: [
+          'Books',
+          'Kitchen & Dinning',
+          'Electronics',
+          'Baby',
+          'Beauty & Health',
+          'Home Improvement',
+          'Women',
+          'Men',
+          'Grocery'
+        ]
+      },
+    ])
+    .then(function(res) {
+
+     connection.query(
+        "INSERT INTO products SET ?",
+        {
+          product_name: res.productname,
+          department_name: res.category,
+          stock_quantity: res.quantity,
+          cost : res.cost,
+          price: res.price,
+        },
+        function(err, res) {
+
+          if(err) throw err;
+
+          console.log(res.affectedRows + " product inserted!\n");
+          mgrMenu();
+        }
+      
+      );
+    });
+    
+    }
+
+  
+
+    function updateInv(item, newInv) {
+      var item = item;
+      var inv = newInv;
+    
+      console.log('Inv function called');
+      var query = connection.query(
+        'UPDATE products SET ? WHERE ?',
+        [
+          {
+            stock_quantity: newInv,
+          },
+          {
+            item_id: item,
+          },
+        ],
+        function(err, res) {
+          console.log(res.affectedRows + ' products updated!\n');
+        }
+      );
+    }
