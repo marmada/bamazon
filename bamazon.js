@@ -227,9 +227,9 @@ function mgrMenu() {
         'Add Product',
         'Check Store Stock Status',
         'Check Low Inventory',
-        'Create New User',
-        'Update Existing User to MGR',
         'Update Product Inventory',
+        'Create New User',
+        'Update Existing User Type (User to MGR or MGR to USER)',
         'Shop',
         'Go back to Main Menu',
       ],
@@ -252,7 +252,7 @@ function mgrMenu() {
           productInv();
           break;
 
-        case 'Update Existing User to MGR':
+        case 'Update Existing User Type (User to MGR or MGR to USER)':
           //updateUser();
           break;
 
@@ -265,7 +265,7 @@ function mgrMenu() {
           break;
 
         case 'Create New User':
-          //newUserMGR();
+          newUserMGR();
           break;
 
         case 'Go back to Main Menu':
@@ -467,61 +467,104 @@ function addNewProduct() {
     });
 }
 
-function updateInventoryMGR(){
-
+function updateInventoryMGR() {
   productInv();
 
-  inquirer.prompt([
-    {
-      type: "input",
-      name: "id",
-      message: "Select Item Id to be updated: "
-    },
-    {
-      type: "input",
-      name: "newInv",
-      message: "Enter New Quantity Available: "
-    },
-    {
-      type: "confirm",
-      name: "otherItem",
-      message: "Would you like to update Another Item? "
-    },
-  ]).then(function(res){
-
-  console.log('Inv Update function called');
-
-  var query = connection.query(
-    'UPDATE products SET ? WHERE ?',
-    [
+  inquirer
+    .prompt([
       {
-        stock_quantity: res.newInv,
+        type: 'input',
+        name: 'id',
+        message: 'Select Item Id to be updated: ',
       },
       {
-        item_id: id,
+        type: 'input',
+        name: 'newInv',
+        message: 'Enter New Quantity Available: ',
       },
-    ],
-    function(err, res) {
-      console.log(res.affectedRows + ' products updated!\n');
-    }
+      {
+        type: 'confirm',
+        name: 'otherItem',
+        message: 'Would you like to update Another Item? ',
+      },
+    ])
+    .then(function(res) {
+      console.log('Inv Update function called');
 
-  );
- var option = res.otherItem;
-
-  switch (option) {
-    case true:
-      updateInventoryMGR();
-      break;
-
-    case false:
-      console.log(
-        'Product Updated, Going back to Manager Menu'
+      var query = connection.query(
+        'UPDATE products SET ? WHERE ?',
+        [
+          {
+            stock_quantity: res.newInv,
+          },
+          {
+            item_id: id,
+          },
+        ],
+        function(err, res) {
+          console.log(res.affectedRows + ' products updated!\n');
+        }
       );
-      mgrMenu();
-      break;
+      var option = res.otherItem;
 
-      default :
-      start();
-  }
-});
+      switch (option) {
+        case true:
+          updateInventoryMGR();
+          break;
+
+        case false:
+          console.log('Product Updated, Going back to Manager Menu');
+          mgrMenu();
+          break;
+
+        default:
+          start();
+      }
+    });
+}
+
+function newUserMGR() {
+  console.log(
+    'Hellow, a menu will be prompt to create the new user account!\n'
+  );
+
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'username',
+        message: 'Please enter an email/username to create the account :',
+      },
+      {
+        type: 'input',
+        name: 'password',
+        message: 'Please create a password (alphanumeric)',
+      },
+      {
+        type: 'rawlist',
+        name: 'type',
+        message: 'Please select profile Type (USER OR MGR)',
+        choices: ['USER', 'MGR'],
+      },
+    ])
+    .then(function(nUser) {
+      var query = 'INSERT INTO user SET ?';
+
+      connection.query(
+        query,
+        {
+          username: nUser.username,
+          passw: nUser.password,
+          user_type: nUser.type,
+        },
+        function(err, res) {
+          console.log(
+            res.affectedRows +
+              ' new user has been created \n' +
+              'You will be returned to the Manager Manue.\n'
+          );
+          mgrMenu();
+        }
+      );
+    });
 }
