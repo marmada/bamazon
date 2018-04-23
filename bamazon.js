@@ -231,7 +231,7 @@ function mgrMenu() {
         'Update Existing User to MGR',
         'Update Product Inventory',
         'Shop',
-        'Go back to Main Menu'
+        'Go back to Main Menu',
       ],
       name: 'bamazonMGR',
     })
@@ -269,12 +269,12 @@ function mgrMenu() {
           break;
 
         case 'Go back to Main Menu':
-         start();
+          start();
           break;
 
-          case 'Shop':
+        case 'Shop':
           showStore();
-           break;
+          break;
 
         default:
           console.log('Invalid Choice, going back to the main menu');
@@ -406,14 +406,13 @@ function lowInv() {
   });
 }
 
-function addNewProduct(){
+function addNewProduct() {
   inquirer
     .prompt([
       {
         type: 'input',
         name: 'productname',
-        message:
-          'Please enter new Product Name/Description:',
+        message: 'Please enter new Product Name/Description:',
       },
       {
         name: 'quantity',
@@ -443,53 +442,86 @@ function addNewProduct(){
           'Home Improvement',
           'Women',
           'Men',
-          'Grocery'
-        ]
+          'Grocery',
+        ],
       },
     ])
     .then(function(res) {
-
-     connection.query(
-        "INSERT INTO products SET ?",
+      connection.query(
+        'INSERT INTO products SET ?',
         {
           product_name: res.productname,
           department_name: res.category,
           stock_quantity: res.quantity,
-          cost : res.cost,
+          cost: res.cost,
           price: res.price,
         },
         function(err, res) {
+          if (err) throw err;
 
-          if(err) throw err;
-
-          console.log(res.affectedRows + " product inserted!\n");
-          mgrMenu();
+          console.log(res.affectedRows + ' product inserted!\n');
         }
-      
       );
+
+      mgrMenu();
     });
-    
+}
+
+function updateInventoryMGR(){
+
+  productInv();
+
+  inquirer.prompt([
+    {
+      type: "input",
+      name: "id",
+      message: "Select Item Id to be updated: "
+    },
+    {
+      type: "input",
+      name: "newInv",
+      message: "Enter New Quantity Available: "
+    },
+    {
+      type: "confirm",
+      name: "otherItem",
+      message: "Would you like to update Another Item? "
+    },
+  ]).then(function(res){
+
+  console.log('Inv Update function called');
+
+  var query = connection.query(
+    'UPDATE products SET ? WHERE ?',
+    [
+      {
+        stock_quantity: res.newInv,
+      },
+      {
+        item_id: id,
+      },
+    ],
+    function(err, res) {
+      console.log(res.affectedRows + ' products updated!\n');
     }
 
-  
+  );
+ var option = res.otherItem;
 
-    function updateInv(item, newInv) {
-      var item = item;
-      var inv = newInv;
-    
-      console.log('Inv function called');
-      var query = connection.query(
-        'UPDATE products SET ? WHERE ?',
-        [
-          {
-            stock_quantity: newInv,
-          },
-          {
-            item_id: item,
-          },
-        ],
-        function(err, res) {
-          console.log(res.affectedRows + ' products updated!\n');
-        }
+  switch (option) {
+    case true:
+      updateInventoryMGR();
+      break;
+
+    case false:
+      console.log(
+        'Product Updated, Going back to Manager Menu'
       );
-    }
+      mgrMenu();
+      break;
+
+      default :
+      start();
+  }
+});
+}
