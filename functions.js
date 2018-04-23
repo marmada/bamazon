@@ -35,6 +35,6 @@ function createUser(){
 }
 
   
-function validateUser(){
+
 
 }

@@ -187,7 +187,7 @@ function shopNow () {
 
             case false:
               console.log (
-                'Thank you for purchasing with Bamazon, the application will close now'
+                'Thank you for purchasing with Bamazon, the application will now close'
               );
               return;
           }
