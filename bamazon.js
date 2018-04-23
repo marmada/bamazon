@@ -45,7 +45,7 @@ function start() {
 
         case 'New User':
           //console.log('create user function working');
-          //createUser();
+          newUser();
           break;
           return;
 
@@ -192,7 +192,10 @@ function shopNow() {
               '\n'
           );
           console.log(
-            'Your order grand total on this session is: $' +
+            'Your total for this purchase is' +
+              orderTotal +
+              '\n' +
+              'Your order grand total on this session is: $' +
               orderGrandTotal +
               '\n'
           );
@@ -216,11 +219,57 @@ function shopNow() {
 }
 
 function mgrMenu() {
-  var query = 'SELECT * FROM products';
+  inquirer
+    .prompt({
+      type: 'rawlist',
+      message: 'Please select from the following options: ',
+      choices: [
+        'Check Store Stock Status',
+        'Update Existing User to MGR',
+        'Check Low Inventory',
+        'Check total SALES by Product',
+        'Create New User',
+      ],
+      name: 'bamazonMGR',
+    })
+    .then(function(res) {
+      // based on their answer, either call the bid or the post functions
 
-  connection.query(query, function(err, store) {
-    console.log('mgrfunction works');
-  });
+      //if (err){ throw err}
+      console.log(res);
+
+      var choice = res.bamazonMGR;
+
+      switch (choice) {
+        case 'Check Store Stock Status':
+          //productInv();
+          break;
+
+        case 'Update Existing User to MGR':
+          //updateUser();
+          break;
+
+        case 'Check Low Inventory':
+        //lowInv();
+        break;
+
+        case 'Check total SALES by Product':
+        //totalSales();
+        break;
+
+        case 'Create New User':
+        //newUserMGR();
+        break;
+        
+        case 'Exit':
+          return 'Good bye! Thank you for visiting Bamazon';
+          break;
+
+        default:
+          console.log('Invalid Choice, going back to the main menu');
+          start();
+      }
+    });
 }
 
 function updateInv(item, newInv) {
@@ -245,7 +294,7 @@ function updateInv(item, newInv) {
 }
 
 function newUser() {
-  Console.log(
+  console.log(
     'Welcome to BAMAZON, a menu will be prompt to create your new account!\n'
   );
 
@@ -259,20 +308,26 @@ function newUser() {
       {
         type: 'input',
         name: 'password',
-        message: 'Please create a password (numbers & letters)',
+        message: 'Please create a password (alphanumeric)',
       },
     ])
     .then(function(nUser) {
-      var query = connection.query(
-        'INSERT INTO users SET ?',
+      var query = 'INSERT INTO user SET ?';
+
+      connection.query(
+        query,
         {
           username: nUser.username,
           passw: nUser.password,
-          user_type: "USER",
+          user_type: 'USER',
         },
         function(err, res) {
-          console.log(res.affectedRows + ' new user has been created \n' + 'You will be return to the main menu, then you can go ahead an login \n');
-           login();
+          console.log(
+            res.affectedRows +
+              ' new user has been created \n' +
+              'You will be return to the main menu, then you can go ahead an login \n'
+          );
+          login();
         }
       );
     });
