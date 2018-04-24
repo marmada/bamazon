@@ -247,7 +247,7 @@ function mgrMenu() {
     .then(function(res) {
       // based on their answer, either call the bid or the post functions
 
-      //if (err){ throw err}
+      if (err){ throw err}
       console.log(res);
 
       var choice = res.bamazonMGR;
@@ -542,6 +542,45 @@ function newUserMGR() {
             res.affectedRows +
               ' new user has been created \n' +
               'You will be returned to the Manager Manue.\n'
+          );
+          mgrMenu();
+        }
+      );
+    });
+}
+
+function updateUser() {
+  console.log('Hello, a menu will be prompt to update a user account!\n\r');
+
+  inquirer
+    .prompt([
+      {
+        type: 'input',
+        name: 'username',
+        message: 'Please enter an email/username to create the account :',
+      },
+      
+      {
+        type: 'rawlist',
+        name: 'type',
+        message: 'Please select profile Type (USER OR MGR)',
+        choices: ['USER', 'MGR'],
+      },
+    ])
+    .then(function(user) {
+      var query = connection.query("UPDATE user SET ? WHERE ?",
+      [
+        {
+          user_type: user.type
+        },
+        {
+          username: user.username
+        }],
+        function(err, res) {
+          console.log(
+            res.affectedRows +
+              ' user type has been updated\n\r' +
+              'You will be returned to the Manager Manue.\n\r'
           );
           mgrMenu();
         }
