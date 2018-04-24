@@ -219,7 +219,7 @@ function shopNow() {
                   'Thank you for purchasing with Bamazon, the application will now close'
                 );
                 updateInv(item, newInv);
-                return;
+                start();
             }
           }
         }
